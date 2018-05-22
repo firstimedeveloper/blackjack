@@ -7,7 +7,7 @@ import (
 )
 
 type Player struct {
-	card     []deck.Card
+	hand     []deck.Card
 	isDealer bool
 }
 
@@ -28,7 +28,7 @@ func StartGame(numOfPlayers int) {
 			dealtCard = gameDeck[len(gameDeck)-1]
 			gameDeck = gameDeck[:len(gameDeck)-1]
 			//append dealtcard to hand
-			players[i].card = append(players[i].card, dealtCard)
+			players[i].hand = append(players[i].hand, dealtCard)
 			//players[0][0]
 			//players[1][0]
 			if i == numOfPlayers-1 {
@@ -36,8 +36,11 @@ func StartGame(numOfPlayers int) {
 			} //else false, but default value for bool is false --so unnecessary
 		}
 	}
+	//printing dealt cards, while not showing last card
+	//seems unnecessarily complicated
+	//TODO make this shorter or something.
 	for i, player := range players {
-		for j, c := range player.card {
+		for j, c := range player.hand {
 			if player.isDealer != true || j != 1 {
 				if i+1 != len(players) {
 					fmt.Printf("Player %d card %d: %v\n", i+1, j+1, c)
@@ -49,12 +52,44 @@ func StartGame(numOfPlayers int) {
 		}
 	}
 
+	//testing purposes
+	//printing the scores
+	for i, player := range players {
+		fmt.Printf("Player %d score: %d\n", i+1, getValueHand(player.hand))
+	}
+
+	var isValid bool //false
+	var choice string
+	for isValid {
+		choice = getInput("hit or stand?")
+		if choice == "hit" || choice == "stand" {
+			isValid = true
+		}
+	}
+	switch choice {
+	case "hit":
+		//somefunc
+	case "stand":
+		//somefunc
+	}
+
 }
 
-func getValue(c deck.Card) int {
+func getValueHand(d []deck.Card) int {
+	var score int
+	for _, c := range d {
+		score += getValueCard(c)
+	}
+
+	return score
+}
+
+func getValueCard(c deck.Card) int {
 	switch c.Rank {
 	case deck.Jack, deck.Queen, deck.King:
 		return 10
+	case deck.Ace:
+		return 11
 	default:
 		return int(c.Rank)
 	}
@@ -64,5 +99,5 @@ func getInput(phrase string) string {
 	fmt.Println(phrase)
 	var input string
 	fmt.Scanln(&input)
-	return input
+	return input, nil
 }
