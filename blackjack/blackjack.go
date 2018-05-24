@@ -99,5 +99,5 @@ func getInput(phrase string) string {
 	fmt.Println(phrase)
 	var input string
 	fmt.Scanln(&input)
-	return input, nil
+	return input
 }
