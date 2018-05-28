@@ -62,10 +62,10 @@ func StartGame(numOfPlayers int) {
 	//testing purposes
 	//printing the scores
 	for i, player := range players {
-		fmt.Printf("Player %d score: %d\n", i+1, getValueHand(player))
+		fmt.Printf("Player %d score: %d\n", i+1, player.getValueHand())
 	}
 
-	for i := range players {
+	for _, player := range players {
 		endOfTurn := false
 		for !endOfTurn {
 			validInput := false
@@ -81,7 +81,8 @@ func StartGame(numOfPlayers int) {
 				dealtCard = gameDeck[len(gameDeck)-1]
 				gameDeck = gameDeck[:len(gameDeck)-1]
 				//append dealtcard to hand
-				players[i] = append(players[i], dealtCard)
+				player = append(player, dealtCard)
+				fmt.Println(player)
 			case "stand":
 				endOfTurn = true
 				//do nothing
@@ -91,13 +92,9 @@ func StartGame(numOfPlayers int) {
 	}
 
 	for i, player := range players {
-		fmt.Printf("Player %d score: %d\n", i+1, getValueHand(player))
+		fmt.Printf("Player %d score: %d\n", i+1, player.getValueHand())
 	}
 }
-
-// func (p Player) Score(player Player) int{
-
-// }
 
 func printPlayerHand(players []Player) {
 	for i, player := range players {
@@ -114,9 +111,9 @@ func printPlayerHand(players []Player) {
 	}
 }
 
-func getValueHand(d []deck.Card) int {
+func (p Player) getValueHand() int {
 	var score int
-	for _, c := range d {
+	for _, c := range p {
 		score += getValueCard(c)
 	}
 
