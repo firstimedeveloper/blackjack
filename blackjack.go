@@ -6,10 +6,7 @@ import (
 	"github.com/firstimedeveloper/deck"
 )
 
-type Player struct {
-	hand     []deck.Card
-	isDealer bool
-}
+type Player []deck.Card
 
 //StartGame starts the game of BlackJack
 func StartGame(numOfPlayers int) {
@@ -28,12 +25,10 @@ func StartGame(numOfPlayers int) {
 			dealtCard = gameDeck[len(gameDeck)-1]
 			gameDeck = gameDeck[:len(gameDeck)-1]
 			//append dealtcard to hand
-			players[i].hand = append(players[i].hand, dealtCard)
+			players[i] = append(players[i], dealtCard)
 			//players[0][0]
 			//players[1][0]
-			if i == numOfPlayers-1 {
-				players[i].isDealer = true
-			} //else false, but default value for bool is false --so unnecessary
+
 		}
 	}
 	//printing dealt cards, while not showing last card
@@ -44,7 +39,7 @@ func StartGame(numOfPlayers int) {
 	//testing purposes
 	//printing the scores
 	for i, player := range players {
-		fmt.Printf("Player %d score: %d\n", i+1, getValueHand(player.hand))
+		fmt.Printf("Player %d score: %d\n", i+1, getValueHand(player))
 	}
 
 	var isValid bool //false
@@ -66,8 +61,8 @@ func StartGame(numOfPlayers int) {
 
 func printPlayerHand(players []Player) {
 	for i, player := range players {
-		for j, c := range player.hand {
-			if player.isDealer != true || j != 1 {
+		for j, c := range player {
+			if i != len(players)-1 || j != 1 {
 				if i+1 != len(players) {
 					fmt.Printf("Player %d card %d: %v\n", i+1, j+1, c)
 
