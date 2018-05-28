@@ -2,13 +2,28 @@ package blackjack
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/firstimedeveloper/deck"
 )
 
-type Player struct {
-	hand     []deck.Card
-	isDealer bool
+//Player type of slice of cards
+type Player []deck.Card
+
+//String function returns the player's hand in a formated string
+//taken from the gophercises cource
+func (p Player) String() string {
+	str := make([]string, len(p))
+	for i := range p {
+		str[i] = p[i].String()
+	}
+	return strings.Join(str, ", ")
+}
+
+//DealerString function returns a formated string for the dealer
+//taken from gophercises
+func (p Player) DealerString() string {
+	return p[0].String() + ", Hidden"
 }
 
 //StartGame starts the game of BlackJack
@@ -28,46 +43,66 @@ func StartGame(numOfPlayers int) {
 			dealtCard = gameDeck[len(gameDeck)-1]
 			gameDeck = gameDeck[:len(gameDeck)-1]
 			//append dealtcard to hand
-			players[i].hand = append(players[i].hand, dealtCard)
+			players[i] = append(players[i], dealtCard)
 			//players[0][0]
 			//players[1][0]
-			if i == numOfPlayers-1 {
-				players[i].isDealer = true
-			} //else false, but default value for bool is false --so unnecessary
+
 		}
 	}
+	dealer := players[len(players)-1]  //dealer is the last player in the players slice
+	players = players[:len(players)-1] //the new players slice doesn't contain the dealer
 	//printing dealt cards, while not showing last card
 	//seems unnecessarily complicated
 	//TODO make this shorter or something.
-	printPlayerHand(players)
+	for i, player := range players {
+		fmt.Printf("player %d: %s\n", i+1, player)
+	}
+	fmt.Printf("Dealer: %s\n", dealer.DealerString())
 
 	//testing purposes
 	//printing the scores
 	for i, player := range players {
-		fmt.Printf("Player %d score: %d\n", i+1, getValueHand(player.hand))
+		fmt.Printf("Player %d score: %d\n", i+1, getValueHand(player))
 	}
 
-	var isValid bool //false
-	var choice string
-	for isValid {
-		choice = getInput("hit or stand?")
-		if choice == "hit" || choice == "stand" {
-			isValid = true
+	for i := range players {
+		endOfTurn := false
+		for !endOfTurn {
+			validInput := false
+			var choice string
+			for !validInput {
+				choice = getInput("hit or stand?")
+				if choice == "hit" || choice == "stand" {
+					validInput = true
+				}
+			}
+			switch choice {
+			case "hit":
+				dealtCard = gameDeck[len(gameDeck)-1]
+				gameDeck = gameDeck[:len(gameDeck)-1]
+				//append dealtcard to hand
+				players[i] = append(players[i], dealtCard)
+			case "stand":
+				endOfTurn = true
+				//do nothing
+			}
+
 		}
 	}
-	switch choice {
-	case "hit":
-		//somefunc
-	case "stand":
-		//somefunc
-	}
 
+	for i, player := range players {
+		fmt.Printf("Player %d score: %d\n", i+1, getValueHand(player))
+	}
 }
+
+// func (p Player) Score(player Player) int{
+
+// }
 
 func printPlayerHand(players []Player) {
 	for i, player := range players {
-		for j, c := range player.hand {
-			if player.isDealer != true || j != 1 {
+		for j, c := range player {
+			if i != len(players)-1 || j != 1 {
 				if i+1 != len(players) {
 					fmt.Printf("Player %d card %d: %v\n", i+1, j+1, c)
 
