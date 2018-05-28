@@ -39,18 +39,7 @@ func StartGame(numOfPlayers int) {
 	//printing dealt cards, while not showing last card
 	//seems unnecessarily complicated
 	//TODO make this shorter or something.
-	for i, player := range players {
-		for j, c := range player.hand {
-			if player.isDealer != true || j != 1 {
-				if i+1 != len(players) {
-					fmt.Printf("Player %d card %d: %v\n", i+1, j+1, c)
-
-				} else {
-					fmt.Printf("Dealer's card %d: %v\n", j+1, c)
-				}
-			}
-		}
-	}
+	printPlayerHand(players)
 
 	//testing purposes
 	//printing the scores
@@ -73,6 +62,21 @@ func StartGame(numOfPlayers int) {
 		//somefunc
 	}
 
+}
+
+func printPlayerHand(players []Player) {
+	for i, player := range players {
+		for j, c := range player.hand {
+			if player.isDealer != true || j != 1 {
+				if i+1 != len(players) {
+					fmt.Printf("Player %d card %d: %v\n", i+1, j+1, c)
+
+				} else {
+					fmt.Printf("Dealer's card %d: %v\n", j+1, c)
+				}
+			}
+		}
+	}
 }
 
 func getValueHand(d []deck.Card) int {
