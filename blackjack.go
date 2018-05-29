@@ -29,9 +29,7 @@ func (p Player) DealerString() string {
 //StartGame starts the game of BlackJack
 func StartGame(numOfPlayers int) {
 	gameDeck := deck.New(deck.Shuffle)
-	for _, card := range gameDeck {
-		fmt.Println(card)
-	}
+
 	getInput("Press enter to play blackjack")
 
 	players := make([]Player, numOfPlayers)
@@ -55,57 +53,59 @@ func StartGame(numOfPlayers int) {
 	//seems unnecessarily complicated
 	//TODO make this shorter or something.
 	for i, player := range players {
-		fmt.Printf("player %d: %s\n", i+1, player)
+		fmt.Printf("player %d's hand: %s\n", i+1, player)
 	}
-	fmt.Printf("Dealer: %s\n", dealer.DealerString())
+	fmt.Printf("Dealer's hand: %s\n", dealer.DealerString())
 
 	//testing purposes
 	//printing the scores
 	for i, player := range players {
-		fmt.Printf("Player %d score: %d\n", i+1, player.getValueHand())
+		fmt.Printf("Player %d's current score: %d\n", i+1, player.getValueHand())
 	}
 
 	for i := range players {
 		endOfTurn := false
 		for !endOfTurn {
+			if players[i].getValueHand() == 21 {
+				fmt.Printf("Player %d got a blackjack!", i+1)
+				endOfTurn = true
+				continue
+			}
 			validInput := false
 			var choice string
 			for !validInput {
-				choice = getInput("hit or stand?")
+				fmt.Println("==============")
+				fmt.Printf("Player %d\n", i+1)
+				choice = getInput("hit or stand? ")
 				if choice == "hit" || choice == "stand" {
 					validInput = true
-				}
-			}
-			switch choice {
-			case "hit":
-				dealtCard = gameDeck[len(gameDeck)-1]
-				gameDeck = gameDeck[:len(gameDeck)-1]
-				//append dealtcard to hand
-				players[i] = append(players[i], dealtCard)
-				fmt.Println(players[i])
-			case "stand":
-				endOfTurn = true
-				//do nothing
-			}
-
-		}
-	}
-
-	for i, player := range players {
-		fmt.Println(player)
-		fmt.Printf("Player %d score: %d\n", i+1, player.getValueHand())
-	}
-}
-
-func printPlayerHand(players []Player) {
-	for i, player := range players {
-		for j, c := range player {
-			if i != len(players)-1 || j != 1 {
-				if i+1 != len(players) {
-					fmt.Printf("Player %d card %d: %v\n", i+1, j+1, c)
-
 				} else {
-					fmt.Printf("Dealer's card %d: %v\n", j+1, c)
+					fmt.Println("Enter a valid word")
+				}
+
+				switch choice {
+				case "hit":
+					dealtCard = gameDeck[len(gameDeck)-1]
+					gameDeck = gameDeck[:len(gameDeck)-1]
+					//append dealtcard to hand
+					players[i] = append(players[i], dealtCard)
+					fmt.Printf("Player %d's hand: %s\n", i+1, players[i])
+					fmt.Printf("Score: %d\n", players[i].getValueHand())
+					if players[i].getValueHand() > 21 {
+						fmt.Println("Busted")
+						endOfTurn = true
+					}
+				case "stand":
+					if players[i].getValueHand() > dealer.getValueHand() {
+						fmt.Printf("Dealer's hand is: %s\nScore: %d\n\n", dealer, dealer.getValueHand())
+						fmt.Println("Better hand than the dealer, you win!")
+
+					} else {
+						fmt.Printf("Dealer's hand is: %s\nScore: %d\n", dealer, dealer.getValueHand())
+						fmt.Println("Dealer has a better hand.")
+					}
+					endOfTurn = true
+					//do nothing
 				}
 			}
 		}
@@ -114,8 +114,28 @@ func printPlayerHand(players []Player) {
 
 func (p Player) getValueHand() int {
 	var score int
+	var aces int
 	for _, c := range p {
+		if c.Rank == deck.Ace {
+			aces++
+		}
 		score += getValueCard(c)
+	}
+	if aces == 0 {
+		return score
+	}
+	scores := make([]int, aces+1)
+
+	count := 0
+	for i := 0; i < cap(scores); i++ {
+		scores[i] += score + (cap(scores)-count)*10
+		count++
+	}
+
+	for _, s := range scores {
+		if s <= 21 {
+			score = s
+		}
 	}
 
 	return score
@@ -125,15 +145,13 @@ func getValueCard(c deck.Card) int {
 	switch c.Rank {
 	case deck.Jack, deck.Queen, deck.King:
 		return 10
-	case deck.Ace:
-		return 11
 	default:
 		return int(c.Rank)
 	}
 }
 
 func getInput(phrase string) string {
-	fmt.Println(phrase)
+	fmt.Print(phrase)
 	var input string
 	fmt.Scanln(&input)
 	return input
