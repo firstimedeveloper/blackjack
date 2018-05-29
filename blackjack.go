@@ -113,27 +113,36 @@ func StartGame(numOfPlayers int) {
 }
 
 func (p Player) getValueHand() int {
+	//I noticed that the number of different combinations of a hand's value with aces
+	//is 1 + # of aces.
+	//Example
+	//A=Ace O=One (where the value of the Ace card can be 11 or 1)
+	//if there's one Ace card in a hand, the possiblility is:
+	//A, O -- 2 possibilities
+	//Two Ace cards:
+	//OO, AO, OO -- 3 possibilities (OA doesn't count as order doesn't change the score)
+
 	var score int
 	var aces int
 	for _, c := range p {
 		if c.Rank == deck.Ace {
-			aces++
+			aces++ //counts the number of aces
 		}
 		score += getValueCard(c)
 	}
 	if aces == 0 {
-		return score
+		return score //the score isn't variable if the hand doesn't contain aces.
 	}
-	scores := make([]int, aces+1)
+	scores := make([]int, aces+1) //A slice of ints with the capacity of # of aces+1
 
 	count := 0
 	for i := 0; i < cap(scores); i++ {
-		scores[i] += score + (cap(scores)-count)*10
+		scores[i] += score + (cap(scores)-count)*10 //This will order the slice in descending order (highest to lowest)
 		count++
 	}
 
 	for _, s := range scores {
-		if s <= 21 {
+		if s <= 21 { //since the order of the slice is descending, the first number below 21 is the score
 			score = s
 		}
 	}
@@ -142,6 +151,8 @@ func (p Player) getValueHand() int {
 }
 
 func getValueCard(c deck.Card) int {
+	//returns the integer score of a specific card
+	//Ace equals to one
 	switch c.Rank {
 	case deck.Jack, deck.Queen, deck.King:
 		return 10
@@ -150,6 +161,8 @@ func getValueCard(c deck.Card) int {
 	}
 }
 
+//not sure if this is a good idea or not
+//but created the function initially cause I didn't want to keep writing the combination.
 func getInput(phrase string) string {
 	fmt.Print(phrase)
 	var input string
