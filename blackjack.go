@@ -54,7 +54,7 @@ func StartGame(numOfPlayers int) {
 	//seems unnecessarily complicated
 	//TODO make this shorter or something.
 	if dealer.isBlackJack() {
-		fmt.Println("Dealer got a blackjack! Game over.")
+		fmt.Println("Dealer got a natural blackjack! Game over.")
 		os.Exit(1)
 	}
 	for i, player := range players {
