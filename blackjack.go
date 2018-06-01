@@ -2,6 +2,8 @@ package blackjack
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/firstimedeveloper/deck"
@@ -27,15 +29,20 @@ func (p Player) DealerString() string {
 }
 
 //StartGame starts the game of BlackJack
-func StartGame(numOfPlayers int) {
+func StartGame() {
 	gameDeck := deck.New(deck.Shuffle)
 
 	getInput("Press enter to play blackjack")
+	numOfPlayers, err := strconv.Atoi(getInput("Enter the number of players: "))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(2)
+	}
 
-	players := make([]Player, numOfPlayers)
+	players := make([]Player, numOfPlayers+1) //+1 as we also need a dealer
 	var dealtCard deck.Card
 	for round := 0; round < 2; round++ {
-		for i := 0; i < numOfPlayers; i++ {
+		for i := 0; i < numOfPlayers+1; i++ { //=1 because we need to account for the dealer
 			//dealtCard is the last Card in the deck
 			//which is the card that is being dealt
 			dealtCard = gameDeck[len(gameDeck)-1]
@@ -67,7 +74,7 @@ func StartGame(numOfPlayers int) {
 		endOfTurn := false
 		for !endOfTurn {
 			if players[i].getValueHand() == 21 {
-				fmt.Printf("Player %d got a blackjack!", i+1)
+				fmt.Printf("Player %d got a blackjack!\n", i+1)
 				endOfTurn = true
 				continue
 			}
@@ -96,20 +103,58 @@ func StartGame(numOfPlayers int) {
 						endOfTurn = true
 					}
 				case "stand":
-					if players[i].getValueHand() > dealer.getValueHand() {
-						fmt.Printf("Dealer's hand is: %s\nScore: %d\n\n", dealer, dealer.getValueHand())
-						fmt.Println("Better hand than the dealer, you win!")
-
-					} else {
-						fmt.Printf("Dealer's hand is: %s\nScore: %d\n", dealer, dealer.getValueHand())
-						fmt.Println("Dealer has a better hand.")
-					}
 					endOfTurn = true
 					//do nothing
 				}
 			}
 		}
 	}
+	fmt.Printf("Dealer's hand is: %s\nScore: %d\n", dealer, dealer.getValueHand())
+	for dealer.getValueHand() < 17 || dealer.isSoftSeventeen() {
+		dealtCard = gameDeck[len(gameDeck)-1]
+		gameDeck = gameDeck[:len(gameDeck)-1]
+		dealer = append(dealer, dealtCard)
+		fmt.Println("The dealer will hit")
+		fmt.Printf("Dealer's new hand is: %s\nScore: %d\n", dealer, dealer.getValueHand())
+	}
+	if dealer.getValueHand() > 21 {
+		fmt.Println("Dealer Busted!")
+	} else {
+		fmt.Println("The dealer will stand")
+
+	}
+
+	for i, player := range players {
+		if player.getValueHand() < 21 {
+			fmt.Println("==========")
+			fmt.Printf("Player %d:\n", i+1)
+			fmt.Printf("Score: %d\n", player.getValueHand())
+			if dealer.getValueHand() > 21 {
+				fmt.Println("Dealer busted so you win!")
+			} else {
+				fmt.Printf("Dealer score: %d\n", dealer.getValueHand())
+				if player.getValueHand() > dealer.getValueHand() {
+					fmt.Println("Better hand than the dealer, you win!")
+				} else if player.getValueHand() == dealer.getValueHand() {
+					fmt.Println("Same score as the dealer. Draw!")
+				} else {
+					fmt.Println("Dealer has a better hand.")
+				}
+			}
+		}
+	}
+}
+
+//isSoftSeventeen returns true if the player has an ace
+//used to determine if the dealer has a soft 17
+func (p Player) isSoftSeventeen() bool {
+
+	for _, card := range p {
+		if card.Rank == deck.Ace && p.getValueHand() == 17 {
+			return true
+		}
+	}
+	return false
 }
 
 func (p Player) getValueHand() int {

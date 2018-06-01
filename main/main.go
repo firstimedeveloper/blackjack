@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	blackjack.StartGame(3)
+	blackjack.StartGame()
 }
