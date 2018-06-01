@@ -3,7 +3,6 @@ package blackjack
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/firstimedeveloper/deck"
@@ -29,15 +28,10 @@ func (p Player) DealerString() string {
 }
 
 //StartGame starts the game of BlackJack
-func StartGame() {
-	gameDeck := deck.New(deck.Shuffle)
+func StartGame(numOfPlayers int) {
+	gameDeck := deck.New(deck.MultipleDecks(3), deck.Shuffle)
 
-	getInput("Press enter to play blackjack")
-	numOfPlayers, err := strconv.Atoi(getInput("Enter the number of players: "))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
-	}
+	GetInput("Press enter to play")
 
 	players := make([]Player, numOfPlayers+1) //+1 as we also need a dealer
 	var dealtCard deck.Card
@@ -59,6 +53,10 @@ func StartGame() {
 	//printing dealt cards, while not showing last card
 	//seems unnecessarily complicated
 	//TODO make this shorter or something.
+	if dealer.isBlackJack() {
+		fmt.Println("Dealer got a blackjack! Game over.")
+		os.Exit(1)
+	}
 	for i, player := range players {
 		fmt.Printf("player %d's hand: %s\n", i+1, player)
 	}
@@ -73,7 +71,7 @@ func StartGame() {
 	for i := range players {
 		endOfTurn := false
 		for !endOfTurn {
-			if players[i].getValueHand() == 21 {
+			if players[i].isBlackJack() {
 				fmt.Printf("Player %d got a blackjack!\n", i+1)
 				endOfTurn = true
 				continue
@@ -83,7 +81,7 @@ func StartGame() {
 			for !validInput {
 				fmt.Println("==============")
 				fmt.Printf("Player %d\n", i+1)
-				choice = getInput("hit or stand? ")
+				choice = GetInput("hit or stand? ")
 				if choice == "hit" || choice == "stand" {
 					validInput = true
 				} else {
@@ -143,6 +141,16 @@ func StartGame() {
 			}
 		}
 	}
+}
+
+//isBlackJack would only return the correct value when the player has 2 cards
+func (p Player) isBlackJack() bool {
+	for _, card := range p {
+		if card.Rank == deck.Ace && p.getValueHand() == 21 {
+			return true
+		}
+	}
+	return false
 }
 
 //isSoftSeventeen returns true if the player has an ace
@@ -208,7 +216,7 @@ func getValueCard(c deck.Card) int {
 
 //not sure if this is a good idea or not
 //but created the function initially cause I didn't want to keep writing the combination.
-func getInput(phrase string) string {
+func GetInput(phrase string) string {
 	fmt.Print(phrase)
 	var input string
 	fmt.Scanln(&input)
