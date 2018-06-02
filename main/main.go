@@ -2,18 +2,25 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/firstimedeveloper/blackjack"
 )
 
 func main() {
-	numOfPlayers, err := strconv.Atoi(blackjack.GetInput("Welcome to blackjack!\nEnter the number of players: "))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
+	fmt.Println("Welcome to Black Jack!")
+	numOfPlayers := 0
+	invalidInput := true
+	for invalidInput {
+		var err error
+		numOfPlayers, err = strconv.Atoi(blackjack.GetInput("Enter the number of players: "))
+		if err != nil {
+			fmt.Println("Not a valid Input")
+		} else {
+			invalidInput = false
+		}
 	}
+
 	gameOver := false
 	var input string
 	for !gameOver {

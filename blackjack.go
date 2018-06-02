@@ -90,8 +90,10 @@ func StartGame(numOfPlayers int) {
 
 				switch choice {
 				case "hit":
-					dealtCard = gameDeck[len(gameDeck)-1]
-					gameDeck = gameDeck[:len(gameDeck)-1]
+					//dealtCard = gameDeck[len(gameDeck)-1]
+					//gameDeck = gameDeck[:len(gameDeck)-1]
+					dealtCard, gameDeck = draw(gameDeck)
+
 					//append dealtcard to hand
 					players[i] = append(players[i], dealtCard)
 					fmt.Printf("Player %d's hand: %s\n", i+1, players[i])
@@ -109,8 +111,9 @@ func StartGame(numOfPlayers int) {
 	}
 	fmt.Printf("Dealer's hand is: %s\nScore: %d\n", dealer, dealer.getValueHand())
 	for dealer.getValueHand() < 17 || dealer.isSoftSeventeen() {
-		dealtCard = gameDeck[len(gameDeck)-1]
-		gameDeck = gameDeck[:len(gameDeck)-1]
+		//dealtCard = gameDeck[len(gameDeck)-1]
+		//gameDeck = gameDeck[:len(gameDeck)-1]
+		dealtCard, gameDeck = draw(gameDeck)
 		dealer = append(dealer, dealtCard)
 		fmt.Println("The dealer will hit")
 		fmt.Printf("Dealer's new hand is: %s\nScore: %d\n", dealer, dealer.getValueHand())
@@ -141,6 +144,14 @@ func StartGame(numOfPlayers int) {
 			}
 		}
 	}
+}
+
+//draw draws the last card from the deck (dealtCard) and returns the dealtCard
+//and the new deck without the dealt card.
+func draw(d []deck.Card) (deck.Card, []deck.Card) {
+	dealtCard := d[len(d)-1]
+	d = d[:len(d)-1]
+	return dealtCard, d
 }
 
 //isBlackJack would only return the correct value when the player has 2 cards
