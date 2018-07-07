@@ -12,6 +12,7 @@ func main() {
 	numOfPlayers := 0
 	invalidInput := true
 	for invalidInput {
+		f
 		var err error
 		numOfPlayers, err = strconv.Atoi(blackjack.GetInput("Enter the number of players: "))
 		if err != nil {

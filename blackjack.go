@@ -8,23 +8,23 @@ import (
 	"github.com/firstimedeveloper/deck"
 )
 
-//Player type of slice of cards
-type Player []deck.Card
+//Hand type of slice of cards
+type Hand []deck.Card
 
 //String function returns the player's hand in a formated string
 //taken from the gophercises cource
-func (p Player) String() string {
-	str := make([]string, len(p))
-	for i := range p {
-		str[i] = p[i].String()
+func (h Hand) String() string {
+	str := make([]string, len(h))
+	for i := range h {
+		str[i] = h[i].String()
 	}
 	return strings.Join(str, ", ")
 }
 
 //DealerString function returns a formated string for the dealer
 //taken from gophercises
-func (p Player) DealerString() string {
-	return p[0].String() + ", Hidden"
+func (h Hand) DealerString() string {
+	return h[0].String() + ", Hidden"
 }
 
 //StartGame starts the game of BlackJack
@@ -33,7 +33,7 @@ func StartGame(numOfPlayers int) {
 
 	GetInput("Press enter to play")
 
-	players := make([]Player, numOfPlayers+1) //+1 as we also need a dealer
+	players := make([]Hand, numOfPlayers+1) //+1 as we also need a dealer
 	var dealtCard deck.Card
 	for round := 0; round < 2; round++ {
 		for i := 0; i < numOfPlayers+1; i++ { //=1 because we need to account for the dealer
@@ -155,9 +155,9 @@ func draw(d []deck.Card) (deck.Card, []deck.Card) {
 }
 
 //isBlackJack would only return the correct value when the player has 2 cards
-func (p Player) isBlackJack() bool {
-	for _, card := range p {
-		if card.Rank == deck.Ace && p.getValueHand() == 21 {
+func (h Hand) isBlackJack() bool {
+	for _, card := range h {
+		if card.Rank == deck.Ace && h.getValueHand() == 21 {
 			return true
 		}
 	}
@@ -166,17 +166,17 @@ func (p Player) isBlackJack() bool {
 
 //isSoftSeventeen returns true if the player has an ace
 //used to determine if the dealer has a soft 17
-func (p Player) isSoftSeventeen() bool {
+func (h Hand) isSoftSeventeen() bool {
 
-	for _, card := range p {
-		if card.Rank == deck.Ace && p.getValueHand() == 17 {
+	for _, card := range h {
+		if card.Rank == deck.Ace && h.getValueHand() == 17 {
 			return true
 		}
 	}
 	return false
 }
 
-func (p Player) getValueHand() int {
+func (h Hand) getValueHand() int {
 	//I noticed that the number of different combinations of a hand's value with aces
 	//is 1 + # of aces.
 	//Example
@@ -188,7 +188,7 @@ func (p Player) getValueHand() int {
 
 	var score int
 	var aces int
-	for _, c := range p {
+	for _, c := range h {
 		if c.Rank == deck.Ace {
 			aces++ //counts the number of aces
 		}
@@ -232,4 +232,11 @@ func GetInput(phrase string) string {
 	var input string
 	fmt.Scanln(&input)
 	return input
+}
+
+type GameState {
+	Deck []deck.Card
+	Turn int
+	Player Hand
+	Dealer Hand
 }
